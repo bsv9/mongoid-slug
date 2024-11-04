@@ -30,7 +30,7 @@ module Mongoid
       #
       # @return [ Array<Document>, Document ] The matching document(s).
       def find(*args)
-        look_like_slugs?(args.__find_args__) ? find_by_slug!(*args) : super
+        look_like_slugs?(prepare_ids_for_find(args)) ? find_by_slug!(*args) : super
       end
 
       # Find the matchind document(s) in the criteria for the provided slugs.
@@ -45,9 +45,9 @@ module Mongoid
       #
       # @return [ Array<Document>, Document ] The matching document(s).
       def find_by_slug!(*args)
-        slugs = args.__find_args__
+        slugs = prepare_ids_for_find(args)
         raise_invalid if slugs.any?(&:nil?)
-        for_slugs(slugs).execute_or_raise_for_slugs(slugs, args.multi_arged?)
+        for_slugs(slugs).execute_or_raise_for_slugs(slugs, multi_args?(args))
       end
 
       def look_like_slugs?(args)
